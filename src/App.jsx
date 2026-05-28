@@ -69,7 +69,7 @@ function AppInner() {
 
   return (
     <div className="flex min-h-screen overflow-hidden" style={{ background: '#0F172A' }}>
-      <div className='w-[260px] flex-shrink-0'>
+      <div className='hidden md:flex w-[260px] flex-shrink-0'>
         <Sidebar activePage={activePage} setActivePage={setActivePage} />
       </div>
       <main className="flex-1 min-w-0 overflow-y-auto"
