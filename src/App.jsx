@@ -68,12 +68,15 @@ function AppInner() {
   }
 
   return (
-    <div className="flex min-h-screen overflow-hidden" style={{ background: '#0F172A' }}>
+    <div className="flex min-h-screen" style={{ background: '#0F172A' }}>
+      {/* Desktop sidebar */}
       <div className='hidden md:flex w-[260px] flex-shrink-0'>
         <Sidebar activePage={activePage} setActivePage={setActivePage} />
       </div>
+
+      {/* Main content */}
       <main className="flex-1 min-w-0 overflow-y-auto"
-        style={{ paddingBottom: isDesktop ? 32 : 90 }}>
+        style={{ paddingBottom: isDesktop ? 32 : 80 }}>
         <div className="w-full px-4 md:px-8 py-4 md:py-8">
           <AnimatePresence mode="wait">
             <motion.div
@@ -88,6 +91,31 @@ function AppInner() {
           </AnimatePresence>
         </div>
       </main>
+
+      {/* Mobile bottom nav */}
+      <nav className="md:hidden fixed bottom-0 left-0 right-0 border-t border-slate-800"
+        style={{ background: '#111827', zIndex: 9999 }}>
+        <div className="flex w-full">
+          {[
+            { id: 'map',      icon: '🗺️', label: '地圖' },
+            { id: 'courts',   icon: '🏟️', label: '球場' },
+            { id: 'players',  icon: '👥', label: '球友' },
+            { id: 'messages', icon: '💬', label: '訊息' },
+            { id: 'profile',  icon: '👤', label: '我的' },
+          ].map(item => (
+            <button key={item.id} onClick={() => setActivePage(item.id)}
+              className="flex-1 flex flex-col items-center justify-center py-3 gap-1"
+              style={{
+                color: activePage === item.id ? '#3B82F6' : '#64748B',
+                border: 'none', background: 'transparent', cursor: 'pointer'
+              }}>
+              <span style={{ fontSize: 20 }}>{item.icon}</span>
+              <span style={{ fontSize: 11 }}>{item.label}</span>
+            </button>
+          ))}
+        </div>
+      </nav>
+
       <ToastContainer toasts={toasts} removeToast={removeToast} />
     </div>
   )

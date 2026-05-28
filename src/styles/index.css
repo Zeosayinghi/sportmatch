@@ -90,7 +90,7 @@ html, body { margin: 0; padding: 0; background: #0F172A; color: #F8FAFC; height:
 /* Mobile */
 @media (max-width: 768px) {
   .sidebar-desktop { display: none !important; }
-  .mobile-nav { display: flex !important; }
+  .mobile-nav { display: flex !important; position: fixed; bottom: 0; left: 0; right: 0; z-index: 9999; }
   .main-with-sidebar { margin-left: 0 !important; }
 }
 @media (min-width: 769px) {
