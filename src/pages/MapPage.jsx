@@ -86,11 +86,11 @@ export default function MapPage({
       />
 
       {/* ====== 二欄布局 ====== */}
-      <div className="flex gap-4 h-[620px]">
+      <div className="flex flex-col md:flex-row gap-4 md:h-[620px]">
 
         {/* Google Maps */}
       <div
-        className="flex-1 rounded-3xl overflow-hidden border border-slate-700 h-full"
+        className="flex-1 rounded-3xl overflow-hidden border border-slate-700 h-[400px] md:h-full]"
         style={{ border: '1px solid #334155', background: '#0F172A' }}
       >
         {selected?.lat && selected?.lng ? (
@@ -117,7 +117,7 @@ export default function MapPage({
 
         {/* Panel */}
         <div
-          className="w-[340px] h-full rounded-3xl p-5 border border-slate-700"
+          className="w-full md:w-[340px] md:h-full rounded-3xl p-5 border border-slate-700"
         >
           <CourtSidePanel
             court={selectedCourt}
