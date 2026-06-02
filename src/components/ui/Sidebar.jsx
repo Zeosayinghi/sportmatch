@@ -4,6 +4,7 @@ import { useAuth } from '../../context/AuthContext.jsx'
 const NAV_ITEMS = [
   { id: 'map',      icon: '🗺️',  label: '地圖總覽' },
   { id: 'courts',   icon: '🏟️',  label: '附近球場' },
+  { id: 'nearby',   icon: '📍',  label: '附近球友' },
   { id: 'players',  icon: '👥',  label: '球友媒合' },
   { id: 'messages', icon: '💬',  label: '訊息中心' },
   { id: 'profile',  icon: '👤',  label: '我的頁面' },

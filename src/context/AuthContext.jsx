@@ -228,6 +228,26 @@ export function AuthProvider({ children }) {
     return convs.sort((a, b) => b.lastTimestamp - a.lastTimestamp)
   }
 
+
+  // ── Location ─────────────────────────────────────────────────────────────
+
+  async function updateLocation(lat, lng) {
+    if (!currentUser) return
+    await supabase.from('users').update({
+      lat, lng,
+      last_seen: new Date().toISOString(),
+    }).eq('id', currentUser.id)
+  }
+
+  async function getNearbyUsers() {
+    if (!currentUser) return []
+    const { data } = await supabase
+      .from('users')
+      .select('*')
+      .neq('id', currentUser.id)
+    return (data || []).map(u => ({ ...u, displayName: u.display_name }))
+  }
+
   if (loading) {
     return (
       <div style={{ minHeight: '100vh', background: '#0F172A', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
@@ -244,6 +264,7 @@ export function AuthProvider({ children }) {
       myFriends, myFriendIds, isFriend, myPendingRequests,
       sendFriendRequest, hasSentRequest, acceptFriendRequest, declineFriendRequest, removeFriend,
       getMessages, sendMessage, getConversations,
+      updateLocation, getNearbyUsers,
     }}>
       {children}
     </AuthContext.Provider>

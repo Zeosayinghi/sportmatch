@@ -11,6 +11,7 @@ import CourtsPage  from './pages/CourtsPage.jsx'
 import MatchPage   from './pages/MatchPage.jsx'
 import ChatPage    from './pages/ChatPage.jsx'
 import ProfilePage from './pages/ProfilePage.jsx'
+import NearbyPage  from './pages/NearbyPage.jsx'
 
 function AppInner() {
   const { currentUser } = useAuth()
@@ -62,6 +63,11 @@ function AppInner() {
         )
       case 'profile':
         return <ProfilePage showToast={showToast} />
+      case 'nearby':
+        return (
+          <NearbyPage showToast={showToast} setActivePage={setActivePage}
+            setOpenChatFriendId={setOpenChatFriendId} />
+        )
       default:
         return null
     }
@@ -99,6 +105,7 @@ function AppInner() {
           {[
             { id: 'map',      icon: '🗺️', label: '地圖' },
             { id: 'courts',   icon: '🏟️', label: '球場' },
+            { id: 'nearby',   icon: '📍', label: '附近' },
             { id: 'players',  icon: '👥', label: '球友' },
             { id: 'messages', icon: '💬', label: '訊息' },
             { id: 'profile',  icon: '👤', label: '我的' },
