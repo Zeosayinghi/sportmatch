@@ -29,7 +29,7 @@ export default function CourtCard({ court, onBook, onFlyTo, isHighlighted, showT
       setBooking(false)
       setSelectedSlot(null)
       setExpanded(false)
-      showToast && showToast(\`✅ 已送出預約申請：\${court.name} \${selectedSlot}\`)
+      showToast && showToast('已送出預約申請：' + court.name + ' ' + selectedSlot)
       return
     }
     onBook(court, selectedSlot)
