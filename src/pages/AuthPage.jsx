@@ -38,10 +38,10 @@ export default function AuthPage() {
   const [error, setError] = useState('')
   const [step, setStep] = useState(1) // 1 or 2 for register
 
-  function handleLogin(e) {
+  async function handleLogin(e) {
     e.preventDefault()
     setError('')
-    const res = login(loginForm.username, loginForm.password)
+    const res = await login(loginForm.username, loginForm.password)
     if (res.error) setError(res.error)
   }
 
