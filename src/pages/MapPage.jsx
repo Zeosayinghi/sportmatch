@@ -36,7 +36,7 @@ export default function MapPage({
 
   const filtered = useMemo(() => {
     return courts.filter(c => {
-      if (sportFilter !== 'all' && !c.sports?.includes(sportFilter)) return false
+      if (sportFilter !== 'all' && !(Array.isArray(c.sports) ? c.sports : []).includes(sportFilter)) return false
       if (statusFilter !== 'all' && c.status !== statusFilter) return false
       if (cityFilter !== 'all' && c.city !== cityFilter) return false
       return true
