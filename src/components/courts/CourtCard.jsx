@@ -14,7 +14,7 @@ export default function CourtCard({ court, onBook, onFlyTo, isHighlighted }) {
   }
 
   const borderColor = {
-    free: '#22C55E', moderate: '#EAB308', busy: '#EF4444', booked: '#3B82F6'
+    free: '#22C55E', moderate: '#EAB308', busy: '#EF4444', booked: '#3B82F6', closed: '#475569'
   }[court.status] || '#334155'
 
   return (

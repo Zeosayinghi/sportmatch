@@ -1,5 +1,6 @@
 ﻿import { useState, useEffect, useCallback } from 'react'
 import { fetchCourts } from '../services/iplayApi.js'
+import { supabase } from '../lib/supabase.js'
 
 /**
  * 球場資料 hook
@@ -14,12 +15,40 @@ export function useCourts() {
   const [dataSource, setSource]   = useState(null)  // 'iplay' | 'fallback'
   const [userPos,    setUserPos]  = useState(null)  // { lat, lng }
 
+  // Convert a Supabase venue record to the same shape as iPlay courts
+  function venueToCourtShape(v) {
+    return {
+      id: `venue_${v.id}`,
+      name: v.venue_name || '未命名球場',
+      city: v.address ? v.address.slice(0, 3) : '未知',
+      district: v.address ? v.address.slice(3, 6) : '',
+      address: v.address || '',
+      lat: null,
+      lng: null,
+      sports: v.sports || [],
+      price: 0,
+      phone: '',
+      hours: v.open_time && v.close_time ? `${v.open_time}-${v.close_time}` : '洽詢球場',
+      rating: 5.0,
+      totalCourts: 1,
+      freeCourts: v.is_open ? 1 : 0,
+      occupancy: 0,
+      status: v.is_open ? 'free' : 'closed',
+      distance: 9999,
+      isVenueAccount: true,
+    }
+  }
+
   const load = useCallback(async (lat = null, lng = null) => {
     setLoading(true)
     setError(null)
     try {
-      const { courts: data, source, error: apiError } = await fetchCourts(lat, lng)
-      setCourts(data)
+      const [{ courts: data, source, error: apiError }, venueRes] = await Promise.all([
+        fetchCourts(lat, lng),
+        supabase.from('venues').select('*').eq('is_open', true),
+      ])
+      const venueCourts = (venueRes.data || []).map(venueToCourtShape)
+      setCourts([...venueCourts, ...data])
       setSource(source)
       if (apiError) setError(apiError)
     } catch (e) {
