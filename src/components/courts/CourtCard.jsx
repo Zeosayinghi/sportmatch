@@ -1,13 +1,37 @@
 ﻿import { useState } from 'react'
 import { motion } from 'framer-motion'
 import { StatusBadge, SportTag, StarRating } from '../ui/Badges.jsx'
+import { supabase } from '../../lib/supabase.js'
+import { useAuth } from '../../context/AuthContext.jsx'
 
-export default function CourtCard({ court, onBook, onFlyTo, isHighlighted }) {
+export default function CourtCard({ court, onBook, onFlyTo, isHighlighted, showToast }) {
   const [expanded, setExpanded] = useState(false)
   const [selectedSlot, setSelectedSlot] = useState(null)
+  const [booking, setBooking] = useState(false)
+  const { currentUser } = useAuth()
 
-  function handleBook() {
+  async function handleBook() {
     if (!selectedSlot) return
+    // Venue account court → write to bookings table
+    if (court.isVenueAccount) {
+      setBooking(true)
+      const venueId = court.id.replace('venue_', '')
+      const today = new Date().toISOString().split('T')[0]
+      await supabase.from('bookings').insert({
+        venue_id: venueId,
+        user_id: currentUser?.id || 'guest',
+        user_name: currentUser?.displayName || currentUser?.display_name || '訪客',
+        court_name: court.name,
+        booking_date: today,
+        booking_time: selectedSlot,
+        status: 'pending',
+      })
+      setBooking(false)
+      setSelectedSlot(null)
+      setExpanded(false)
+      showToast && showToast(\`✅ 已送出預約申請：\${court.name} \${selectedSlot}\`)
+      return
+    }
     onBook(court, selectedSlot)
     setSelectedSlot(null)
     setExpanded(false)
@@ -95,7 +119,7 @@ export default function CourtCard({ court, onBook, onFlyTo, isHighlighted }) {
         >
           <p className="text-xs font-semibold text-slate-400 mb-2">今日可預約時段</p>
           <div className="flex flex-wrap gap-1.5 mb-4">
-            {court.slots?.map(slot => (
+            {(court.isVenueAccount ? (court.time_slots || []) : (court.slots || [])).map(slot => (
               <button key={slot}
                 onClick={() => setSelectedSlot(slot === selectedSlot ? null : slot)}
                 className="px-3 py-1.5 rounded-xl text-xs font-semibold transition-all btn-scale"
@@ -119,14 +143,14 @@ export default function CourtCard({ court, onBook, onFlyTo, isHighlighted }) {
             🕐 {court.hours}　{court.phone && `📞 ${court.phone}`}　
             💰 {court.price === 0 ? '免費' : `$${court.price}/hr`}
           </div>
-          <button onClick={handleBook} disabled={!selectedSlot}
+          <button onClick={handleBook} disabled={!selectedSlot || booking || (court.isVenueAccount && !court.time_slots?.length)}
             className="w-full h-10 rounded-xl font-bold text-sm transition-all btn-scale"
             style={{
               background: selectedSlot ? '#2563EB' : '#1E293B',
               color: selectedSlot ? '#fff' : '#475569',
               cursor: selectedSlot ? 'pointer' : 'not-allowed',
             }}>
-            {selectedSlot ? `確認預約 ${selectedSlot}` : '請先選擇時段'}
+            {booking ? '送出中...' : selectedSlot ? `確認預約 ${selectedSlot}` : court.isVenueAccount && !(court.time_slots?.length) ? '暫無可預約時段' : '請先選擇時段'}
           </button>
         </motion.div>
       )}

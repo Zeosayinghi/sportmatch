@@ -36,6 +36,7 @@ export function useCourts() {
       status: v.is_open ? 'free' : 'closed',
       distance: 9999,
       isVenueAccount: true,
+      time_slots: v.time_slots || [],
     }
   }
 

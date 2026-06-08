@@ -22,6 +22,75 @@ const STATUS_COLOR = {
   pending:   { bg: '#431407', text: '#FED7AA', label: '待確認' },
 }
 
+
+function TimeSlotManager({ slots, onChange }) {
+  const [newSlot, setNewSlot] = useState('')
+
+  const QUICK_SLOTS = [
+    '08:00', '09:00', '10:00', '11:00', '12:00', '13:00',
+    '14:00', '15:00', '16:00', '17:00', '18:00', '19:00', '20:00', '21:00',
+  ]
+
+  function addSlot(slot) {
+    if (!slot || slots.includes(slot)) return
+    onChange([...slots, slot].sort())
+  }
+
+  function removeSlot(slot) {
+    onChange(slots.filter(s => s !== slot))
+  }
+
+  const iStyle2 = {
+    background: '#0F172A', border: '1px solid #334155', color: '#F8FAFC',
+    borderRadius: 10, padding: '8px 12px', fontSize: 13, outline: 'none',
+  }
+
+  return (
+    <div>
+      {/* Quick add */}
+      <p style={{ color: '#94A3B8', fontSize: 11, fontWeight: 600, marginBottom: 8, textTransform: 'uppercase', letterSpacing: '0.05em' }}>快速新增</p>
+      <div style={{ display: 'flex', flexWrap: 'wrap', gap: 6, marginBottom: 16 }}>
+        {QUICK_SLOTS.filter(s => !slots.includes(s)).map(s => (
+          <button key={s} onClick={() => addSlot(s)} type="button"
+            style={{ padding: '5px 10px', borderRadius: 8, fontSize: 12, cursor: 'pointer', background: '#0F172A', color: '#64748B', border: '1px solid #334155' }}>
+            + {s}
+          </button>
+        ))}
+      </div>
+
+      {/* Custom add */}
+      <div style={{ display: 'flex', gap: 8, marginBottom: 16 }}>
+        <input type="time" value={newSlot} onChange={e => setNewSlot(e.target.value)}
+          style={{ ...iStyle2, flex: 1 }} />
+        <button onClick={() => { addSlot(newSlot); setNewSlot('') }} type="button"
+          style={{ padding: '8px 16px', borderRadius: 10, fontSize: 13, fontWeight: 600, background: '#2563EB', color: '#fff', border: 'none', cursor: 'pointer' }}>
+          新增
+        </button>
+      </div>
+
+      {/* Current slots */}
+      {slots.length === 0 ? (
+        <p style={{ color: '#475569', fontSize: 12, fontStyle: 'italic' }}>尚未設定時段</p>
+      ) : (
+        <div>
+          <p style={{ color: '#94A3B8', fontSize: 11, fontWeight: 600, marginBottom: 8, textTransform: 'uppercase', letterSpacing: '0.05em' }}>已設定時段（{slots.length}）</p>
+          <div style={{ display: 'flex', flexWrap: 'wrap', gap: 6 }}>
+            {slots.map(s => (
+              <div key={s} style={{ display: 'flex', alignItems: 'center', gap: 4, padding: '5px 10px', borderRadius: 8, background: '#1E3A5F', border: '1px solid #2563EB' }}>
+                <span style={{ color: '#60A5FA', fontSize: 12, fontWeight: 600 }}>{s}</span>
+                <button onClick={() => removeSlot(s)} type="button"
+                  style={{ background: 'none', border: 'none', color: '#475569', cursor: 'pointer', fontSize: 14, padding: '0 0 0 4px', lineHeight: 1 }}>
+                  ×
+                </button>
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
+    </div>
+  )
+}
+
 export default function VenueDashboard({ showToast }) {
   const { currentUser, logout, getVenueInfo, updateVenueInfo, getVenueBookings, updateBookingStatus } = useAuth()
 
@@ -34,7 +103,7 @@ export default function VenueDashboard({ showToast }) {
   // Settings form
   const [form, setForm] = useState({
     venue_name: '', address: '', sports: [],
-    is_open: false, open_time: '08:00', close_time: '22:00',
+    is_open: false, open_time: '08:00', close_time: '22:00', time_slots: [],
   })
 
   // Booking filters
@@ -349,6 +418,16 @@ export default function VenueDashboard({ showToast }) {
                     ⏰ 營業時間：{form.open_time} — {form.close_time}
                   </p>
                 </div>
+              </div>
+
+              {/* Time slots card */}
+              <div style={{ background: '#1E293B', border: '1px solid #334155', borderRadius: 16, padding: 24, marginTop: 20 }}>
+                <p style={{ color: '#fff', fontWeight: 700, fontSize: 15, margin: '0 0 16px' }}>可預約時段</p>
+                <p style={{ color: '#64748B', fontSize: 12, margin: '0 0 12px' }}>設定開放給使用者預約的時段</p>
+                <TimeSlotManager
+                  slots={form.time_slots}
+                  onChange={slots => setForm(p => ({ ...p, time_slots: slots }))}
+                />
               </div>
             </div>
 
