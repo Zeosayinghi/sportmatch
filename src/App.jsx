@@ -11,7 +11,8 @@ import CourtsPage  from './pages/CourtsPage.jsx'
 import MatchPage   from './pages/MatchPage.jsx'
 import ChatPage    from './pages/ChatPage.jsx'
 import ProfilePage from './pages/ProfilePage.jsx'
-import NearbyPage  from './pages/NearbyPage.jsx'
+import NearbyPage      from './pages/NearbyPage.jsx'
+import VenueDashboard from './pages/VenueDashboard.jsx'
 
 function AppInner() {
   const { currentUser } = useAuth()
@@ -36,6 +37,7 @@ function AppInner() {
   }, [])
 
   if (!currentUser) return <AuthPage />
+  if (currentUser.role === 'venue') return <VenueDashboard showToast={showToast} />
 
   function renderPage() {
     switch (activePage) {

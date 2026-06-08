@@ -33,6 +33,7 @@ export default function AuthPage() {
     username: '', password: '', confirmPassword: '',
     displayName: '', sport: 'basketball', level: 'intermediate',
     district: '', bio: '', slots: [],
+    role: 'user', venueName: '',
   })
   const [error, setError] = useState('')
   const [step, setStep] = useState(1) // 1 or 2 for register
@@ -51,6 +52,20 @@ export default function AuthPage() {
     if (!regForm.password.trim()) return setError('請輸入密碼')
     if (regForm.password !== regForm.confirmPassword) return setError('兩次密碼不一致')
     if (!regForm.displayName.trim()) return setError('請輸入顯示名稱')
+    if (regForm.role === 'venue') {
+      // Venue accounts skip step 2
+      const res = register(regForm)
+      if (res.then) {
+        res.then(r => {
+          if (r.error) setError(r.error)
+          else { setSuccess(true); setTimeout(() => login(regForm.username, regForm.password), 1500) }
+        })
+      } else {
+        if (res.error) setError(res.error)
+        else { setSuccess(true); setTimeout(() => login(regForm.username, regForm.password), 1500) }
+      }
+      return
+    }
     setStep(2)
   }
 
@@ -126,11 +141,39 @@ export default function AuthPage() {
                 <input style={inputStyle} placeholder="英文、數字，不含空格" value={regForm.username}
                   onChange={e => setRegForm(p => ({ ...p, username: e.target.value.trim() }))} autoFocus />
               </div>
+              {/* Role selector */}
+              <div style={{ marginBottom: 14 }}>
+                <label style={labelStyle}>帳號類型</label>
+                <div style={{ display: 'flex', gap: 10 }}>
+                  {[['user','👤 一般使用者'],['venue','🏟️ 球場管理員']].map(([val, label]) => (
+                    <button key={val} type="button"
+                      onClick={() => setRegForm(p => ({ ...p, role: val }))}
+                      style={{
+                        flex: 1, padding: '10px 0', borderRadius: 10, fontSize: 13,
+                        fontWeight: 600, cursor: 'pointer', border: '1px solid',
+                        background: regForm.role === val ? '#1E3A5F' : '#0F172A',
+                        borderColor: regForm.role === val ? '#2563EB' : '#334155',
+                        color: regForm.role === val ? '#60A5FA' : '#64748B',
+                      }}>
+                      {label}
+                    </button>
+                  ))}
+                </div>
+              </div>
+
               <div style={{ marginBottom: 14 }}>
                 <label style={labelStyle}>顯示名稱</label>
                 <input style={inputStyle} placeholder="其他用戶看到的名稱" value={regForm.displayName}
                   onChange={e => setRegForm(p => ({ ...p, displayName: e.target.value }))} />
               </div>
+              {regForm.role === 'venue' && (
+                <div style={{ marginBottom: 14 }}>
+                  <label style={labelStyle}>球場名稱</label>
+                  <input style={inputStyle} placeholder="例：大安運動中心" value={regForm.venueName}
+                    onChange={e => setRegForm(p => ({ ...p, venueName: e.target.value }))} />
+                </div>
+              )}
+
               <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 12, marginBottom: 14 }}>
                 <div>
                   <label style={labelStyle}>密碼</label>

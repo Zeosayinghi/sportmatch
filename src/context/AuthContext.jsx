@@ -26,7 +26,7 @@ export function AuthProvider({ children }) {
 
   // ── Auth ────────────────────────────────────────────────────────────────
 
-  async function register({ username, password, displayName, sport, level, district, bio, slots }) {
+  async function register({ username, password, displayName, sport, level, district, bio, slots, role, venueName }) {
     // Check if username taken
     const { data: existing } = await supabase
       .from('users').select('id').eq('id', username).single()
@@ -44,10 +44,15 @@ export function AuthProvider({ children }) {
       district: district || '',
       bio: bio || '',
       slots: slots || [],
+      role: role || 'user',
     })
     if (error) return { error: error.message }
 
-    const user = { id: username, username, displayName, display_name: displayName, avatar, sport, level, district, bio, slots }
+    const user = { id: username, username, displayName, display_name: displayName, avatar, sport, level, district, bio, slots, role: role || 'user' }
+    // If venue, create venue record
+    if (role === 'venue' && venueName) {
+      await supabase.from('venues').insert({ id: username, venue_name: venueName, is_open: false, open_time: '08:00', close_time: '22:00' })
+    }
     saveSession(user)
     return { success: true, user }
   }
@@ -229,6 +234,35 @@ export function AuthProvider({ children }) {
   }
 
 
+
+  // ── Venue ─────────────────────────────────────────────────────────────────
+
+  async function getVenueInfo() {
+    if (!currentUser) return null
+    const { data } = await supabase.from('venues').select('*').eq('id', currentUser.id).single()
+    return data
+  }
+
+  async function updateVenueInfo(updates) {
+    if (!currentUser) return
+    const { data: existing } = await supabase.from('venues').select('id').eq('id', currentUser.id).single()
+    if (existing) {
+      await supabase.from('venues').update({ ...updates, updated_at: new Date().toISOString() }).eq('id', currentUser.id)
+    } else {
+      await supabase.from('venues').insert({ id: currentUser.id, ...updates })
+    }
+  }
+
+  async function getVenueBookings() {
+    if (!currentUser) return []
+    const { data } = await supabase.from('bookings').select('*').eq('venue_id', currentUser.id).order('booking_date', { ascending: false }).order('booking_time', { ascending: false })
+    return data || []
+  }
+
+  async function updateBookingStatus(bookingId, status) {
+    await supabase.from('bookings').update({ status }).eq('id', bookingId)
+  }
+
   // ── Location ─────────────────────────────────────────────────────────────
 
   async function updateLocation(lat, lng) {
@@ -265,6 +299,7 @@ export function AuthProvider({ children }) {
       sendFriendRequest, hasSentRequest, acceptFriendRequest, declineFriendRequest, removeFriend,
       getMessages, sendMessage, getConversations,
       updateLocation, getNearbyUsers,
+      getVenueInfo, updateVenueInfo, getVenueBookings, updateBookingStatus,
     }}>
       {children}
     </AuthContext.Provider>
