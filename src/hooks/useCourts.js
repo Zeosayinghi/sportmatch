@@ -25,7 +25,7 @@ export function useCourts() {
       address: v.address || '',
       lat: null,
       lng: null,
-      sports: v.sports || [],
+      sports: Array.isArray(v.sports) ? v.sports : [],
       price: 0,
       phone: '',
       hours: v.open_time && v.close_time ? `${v.open_time}-${v.close_time}` : '洽詢球場',
@@ -36,7 +36,9 @@ export function useCourts() {
       status: v.is_open ? 'free' : 'closed',
       distance: 9999,
       isVenueAccount: true,
-      time_slots: v.time_slots || [],
+      slots: [],
+      peakHours: [],
+      time_slots: Array.isArray(v.time_slots) ? v.time_slots : [],
     }
   }
 
