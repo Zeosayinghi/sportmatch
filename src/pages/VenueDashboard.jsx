@@ -119,12 +119,13 @@ export default function VenueDashboard({ showToast }) {
     setBookings(b)
     if (v) {
       setForm({
-        venue_name: v.venue_name || '',
-        address:    v.address    || '',
-        sports:     v.sports     || [],
-        is_open:    v.is_open    ?? false,
-        open_time:  v.open_time  || '08:00',
-        close_time: v.close_time || '22:00',
+        venue_name:  v.venue_name  || '',
+        address:     v.address     || '',
+        sports:      Array.isArray(v.sports) ? v.sports : [],
+        is_open:     v.is_open     ?? false,
+        open_time:   v.open_time   || '08:00',
+        close_time:  v.close_time  || '22:00',
+        time_slots:  Array.isArray(v.time_slots) ? v.time_slots : [],
       })
     }
     setLoading(false)

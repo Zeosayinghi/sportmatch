@@ -247,9 +247,11 @@ export function AuthProvider({ children }) {
     if (!currentUser) return
     const { data: existing } = await supabase.from('venues').select('id').eq('id', currentUser.id).single()
     if (existing) {
-      await supabase.from('venues').update({ ...updates, updated_at: new Date().toISOString() }).eq('id', currentUser.id)
+      const { error } = await supabase.from('venues').update({ ...updates, updated_at: new Date().toISOString() }).eq('id', currentUser.id)
+      console.log('update result:', error)
     } else {
-      await supabase.from('venues').insert({ id: currentUser.id, ...updates })
+      const { error } = await supabase.from('venues').insert({ id: currentUser.id, ...updates })
+      console.log('insert result:', error)
     }
   }
 
