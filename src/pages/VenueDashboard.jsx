@@ -23,7 +23,7 @@ const STATUS_COLOR = {
 }
 
 
-function TimeSlotManager({ slots, onChange }) {
+function TimeSlotManager({ slots = [], onChange }) {
   const [newSlot, setNewSlot] = useState('')
 
   const QUICK_SLOTS = [
@@ -50,7 +50,7 @@ function TimeSlotManager({ slots, onChange }) {
       {/* Quick add */}
       <p style={{ color: '#94A3B8', fontSize: 11, fontWeight: 600, marginBottom: 8, textTransform: 'uppercase', letterSpacing: '0.05em' }}>快速新增</p>
       <div style={{ display: 'flex', flexWrap: 'wrap', gap: 6, marginBottom: 16 }}>
-        {QUICK_SLOTS.filter(s => !slots.includes(s)).map(s => (
+        {QUICK_SLOTS.filter(s => !(Array.isArray(slots) ? slots : []).includes(s)).map(s => (
           <button key={s} onClick={() => addSlot(s)} type="button"
             style={{ padding: '5px 10px', borderRadius: 8, fontSize: 12, cursor: 'pointer', background: '#0F172A', color: '#64748B', border: '1px solid #334155' }}>
             + {s}
